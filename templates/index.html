@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Data Workflow</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Sales Data Workflow</h2>
+        <ul class="nav nav-tabs" id="workflowTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="step1-tab" data-toggle="tab" href="#step1" role="tab" aria-controls="step1" aria-selected="true">Step 1: Data Validation</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="step2-tab" data-toggle="tab" href="#step2" role="tab" aria-controls="step2" aria-selected="false">Step 2: Aggregation by Product</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="step3-tab" data-toggle="tab" href="#step3" role="tab" aria-controls="step3" aria-selected="false">Step 3: Aggregation by Region (Zipcode)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="step4-tab" data-toggle="tab" href="#step4" role="tab" aria-controls="step4" aria-selected="false">Step 4: Aggregation by Price</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="step5-tab" data-toggle="tab" href="#step5" role="tab" aria-controls="step5" aria-selected="false">Step 5: Aggregation by Month</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="workflowTabsContent">
+            <div class="tab-pane fade show active" id="step1" role="tabpanel" aria-labelledby="step1-tab">
+                <div id="step1-content"></div>
+            </div>
+            <div class="tab-pane fade" id="step2" role="tabpanel" aria-labelledby="step2-tab">
+                <div id="step2-content"></div>
+            </div>
+            <div class="tab-pane fade" id="step3" role="tabpanel" aria-labelledby="step3-tab">
+                <div id="step3-content"></div>
+            </div>
+            <div class="tab-pane fade" id="step4" role="tabpanel" aria-labelledby="step4-tab">
+                <div id="step4-content"></div>
+            </div>
+            <div class="tab-pane fade" id="step5" role="tabpanel" aria-labelledby="step5-tab">
+                <div id="step5-content"></div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <button class="btn btn-primary" id="startWorkflow">Start Workflow</button>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
