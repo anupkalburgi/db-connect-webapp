@@ -2,7 +2,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_session import Session
 import pandas as pd
-import os
 import uuid
 import sqlite3
 from datetime import datetime
@@ -10,6 +9,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.utils
 import json
+from databricks.connect import DatabricksSession
+from pyspark.sql.functions import mean
+
+spark = DatabricksSession.builder.serverless().getOrCreate()
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your_secret_key"  # Replace with a real secret key
@@ -83,13 +86,13 @@ def step2():
         return redirect(url_for("step1"))
 
     # Validate file path (simplified example)
-    if not os.path.exists(user["file_path"]):
-        return render_template("step2.html", error="File not found")
+    # if not os.path.exists(user["file_path"]):
+    #     return render_template("step2.html", error="File not found")
 
     # Read data (assuming CSV for this example)
     try:
-        df = pd.read_csv(user["file_path"])
-        session["columns"] = df.columns.tolist()
+        df = spark.read.csv(user["file_path"], header=True, inferSchema=True)
+        session["columns"] = df.columns
         return redirect(url_for("step3"))
     except Exception as e:
         return render_template("step2.html", error=str(e))
@@ -106,50 +109,14 @@ def step3():
     if not user["file_path"]:
         return redirect(url_for("step1"))
 
-    df = pd.read_csv(user["file_path"])
+    # df = pd.read_csv(user["file_path"])
+    df = spark.read.csv(user["file_path"], header=True, inferSchema=True)
+    df = df.toPandas()
 
     # Perform initial aggregation (e.g., mean of all numeric columns)
     agg_result = df.select_dtypes(include=["int64", "float64"]).mean()
 
     return render_template("step3.html", agg_result=agg_result.to_dict())
-
-
-# @app.route("/step4", methods=["GET", "POST"])
-# def step4():
-#     conn = get_db_connection()
-#     user = conn.execute(
-#         "SELECT * FROM users WHERE id = ?", (session["user_id"],)
-#     ).fetchone()
-#     conn.close()
-
-#     if not user["file_path"]:
-#         return redirect(url_for("step1"))
-
-#     df = pd.read_csv(user["file_path"])
-#     columns = session.get("columns", [])
-
-#     if request.method == "POST":
-#         agg_columns = request.form.getlist("agg_columns")
-#         agg_function = request.form.get("agg_function")
-#         filter_column = request.form.get("filter_column")
-#         filter_value = request.form.get("filter_value")
-
-#         if filter_column and filter_value:
-#             df = df[df[filter_column] == filter_value]
-
-#         if agg_columns:
-#             result = df.groupby(agg_columns).agg(
-#                 {col: agg_function for col in df.columns if col not in agg_columns}
-#             )
-#         else:
-#             result = df.agg(agg_function)
-
-#         return render_template(
-#             "step4.html", columns=columns, agg_result=result.to_dict()
-#         )
-
-#     return render_template("step4.html", columns=columns)
-
 
 @app.route("/step4", methods=["GET", "POST"])
 def step4():
@@ -162,7 +129,9 @@ def step4():
     if not user["file_path"]:
         return redirect(url_for("step1"))
 
-    df = pd.read_csv(user["file_path"])
+    # df = pd.read_csv(user["file_path"])
+    df = spark.read.csv(user["file_path"], header=True, inferSchema=True)
+    df = df.toPandas()
     columns = df.columns.tolist()
 
     # Assume the first column is the date column
