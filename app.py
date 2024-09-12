@@ -10,7 +10,9 @@ import plotly.graph_objects as go
 import plotly.utils
 import json
 from databricks.connect import DatabricksSession
+from databricks.sdk import WorkspaceClient
 from pyspark.sql.functions import mean
+import secrets
 
 spark = DatabricksSession.builder.serverless().getOrCreate()
 
@@ -117,6 +119,41 @@ def step3():
     agg_result = df.select_dtypes(include=["int64", "float64"]).mean()
 
     return render_template("step3.html", agg_result=agg_result.to_dict())
+
+@app.route("/step3a", methods=["GET", "POST"])
+def step3a():
+    conn = get_db_connection()
+    user = conn.execute(
+        "SELECT * FROM users WHERE id = ?", (session["user_id"],)
+    ).fetchone()
+    conn.close()
+
+    if not user["file_path"]:
+        return redirect(url_for("step1"))
+
+    df = spark.read.csv(user["file_path"], header=True, inferSchema=True)
+    df = df.toPandas()
+
+    if request.method == "POST":
+        filters = {col: request.form.get(col) for col in df.columns}
+        numeric_filters = {col: (request.form.get(f"{col}_min"), request.form.get(f"{col}_max")) for col in df.select_dtypes(include=["int64", "float64"]).columns}
+
+        for col, value in filters.items():
+            if value:
+                df = df[df[col].astype(str).str.contains(value)]
+
+        for col, (min_val, max_val) in numeric_filters.items():
+            if min_val:
+                df = df[df[col] >= float(min_val)]
+            if max_val:
+                df = df[df[col] <= float(max_val)]
+
+    columns = df.columns.tolist()
+    numeric_columns = df.select_dtypes(include=["int64", "float64"]).columns.tolist()
+    data = df.to_dict(orient="records")
+
+    return render_template("step3a.html", columns=columns, numeric_columns=numeric_columns, data=data)
+
 
 @app.route("/step4", methods=["GET", "POST"])
 def step4():
