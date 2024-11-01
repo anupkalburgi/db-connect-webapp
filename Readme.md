@@ -5,6 +5,11 @@ TODO: Add more details about the project.
 
 ## Running the application
 ### Prerequisites
+
+Python version:
+```python
+python 3.12.7
+```
 Install databricks cli: [Databricks CLI](https://docs.databricks.com/en/dev-tools/cli/install.html)
 
 ```bash
