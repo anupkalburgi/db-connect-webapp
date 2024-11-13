@@ -1,2 +1,3 @@
-## Frontend 
-This could a flask app
+uv init frontend
+
+uv add pandas

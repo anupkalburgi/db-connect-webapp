@@ -1,3 +1,4 @@
 pytest
 databricks-connect==15.*
 fastapi[standard]
+python-dotenv==1.0.1
