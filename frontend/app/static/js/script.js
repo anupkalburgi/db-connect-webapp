@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedColumns = [];
     let selectedDataset = null;
     let availableColumns = [];
+    let datasetColumns = {};  // Store dataset columns for validation
 
     // Fetch available datasets using Fetch API
     fetch('/datasets')
@@ -26,6 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const column = columnSelect.value;
         if (column && !selectedColumns.includes(column)) {
             if (!availableColumns.includes(column)) {
+                // log the column name and available columns for debugging
+                console.log("Selected Column:", column, "Available Columns:", availableColumns);
                 alert('Selected column does not exist in the dataset.');
                 return;
             }
@@ -78,30 +81,37 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ dataset: selectedDataset, columns: availableColumns, filters: {} })
         })
             .then(response => response.json())
-            .then(data => {
-                console.log("Loaded Data:", data);  // Debugging line
+            .then(resp => {
+                console.log("Loaded Data:", resp);  // Debugging line
                 const tableHeader = document.getElementById('tableHeader');
                 const tableBody = document.getElementById('tableBody');
 
                 // Clear existing table content
                 tableHeader.innerHTML = '';
                 tableBody.innerHTML = '';
+                const data = resp.data;
 
-                // Populate table headers
+                // Populate table headers dynamically
                 if (data.length > 0) {
-                    availableColumns.forEach(column => {
+                    const headers = Object.keys(data[0]);
+                    headers.forEach(header => {
                         const th = document.createElement('th');
-                        th.textContent = column;
+                        th.textContent = header;
+                        th.style.textAlign = 'center';
+                        th.style.backgroundColor = '#f8f9fa';
+                        th.style.padding = '10px';
+                        th.style.border = '1px solid #dee2e6';
+                        th.textContent = header;
                         tableHeader.appendChild(th);
                     });
                 }
 
-                // Populate table rows
+                // Populate table rows dynamically
                 data.forEach(row => {
                     const tr = document.createElement('tr');
-                    availableColumns.forEach(column => {
+                    Object.keys(row).forEach(key => {
                         const td = document.createElement('td');
-                        td.textContent = row[column];
+                        td.textContent = row[key];
                         tr.appendChild(td);
                     });
                     tableBody.appendChild(tr);
@@ -117,8 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedColumns.forEach(column => {
             const filterValue = document.getElementById(`filter_${column}`).value;
             const filterOperator = document.getElementById(`filter_operator_${column}`).value;
+            const columnType = datasetColumns[selectedDataset][column];
             if (filterValue) {
-                filters[column] = { value: filterValue, operator: filterOperator };
+                filters[column] = { value: filterValue, operator: filterOperator, type: columnType };
             }
         });
 
@@ -130,40 +141,46 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ dataset: selectedDataset, columns: availableColumns, filters: filters })
         })
             .then(response => response.json())
-            .then(data => {
-                console.log("Filtered Data Loaded:", data);  // Debugging line
+            .then(resp => {
                 const tableHeader = document.getElementById('tableHeader');
                 const tableBody = document.getElementById('tableBody');
 
+                console.log("Filtered Data:", resp);  // Debugging line
+                console.log("clearing table body");  // Debugging line
                 // Clear existing table content
                 tableHeader.innerHTML = '';
                 tableBody.innerHTML = '';
+                const data = resp.data;
 
                 // Populate table headers
+                // / Populate table headers dynamically with styling
                 if (data.length > 0) {
-                    availableColumns.forEach(column => {
+                    const headers = Object.keys(data[0]);
+                    headers.forEach(header => {
                         const th = document.createElement('th');
-                        th.textContent = column;
+                        th.textContent = header;
+                        th.style.textAlign = 'center';
+                        th.style.backgroundColor = '#f8f9fa';
+                        th.style.padding = '10px';
+                        th.style.border = '1px solid #dee2e6';
                         tableHeader.appendChild(th);
                     });
-                }
-
-                // Populate table rows
-                data.forEach(row => {
-                    const tr = document.createElement('tr');
-                    availableColumns.forEach(column => {
-                        const td = document.createElement('td');
-                        td.textContent = row[column];
-                        tr.appendChild(td);
+        
+                    // Populate table rows
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        headers.forEach(column => {
+                            const td = document.createElement('td');
+                            td.textContent = row[column];
+                            tr.appendChild(td);
+                        });
+                        tableBody.appendChild(tr);
                     });
-                    tableBody.appendChild(tr);
-                });
+                }
             })
             .catch(error => console.error("Error loading filtered data:", error));
     }
 
-    // Select dataset and load columns
-    // Select dataset and load columns
     // Select dataset and load columns
     window.selectDataset = function (datasetName) {
         selectedDataset = datasetName;  // Set the selected dataset
@@ -174,11 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('datasetTitle').textContent = `${datasetName} Data`;
-        const infoIcon = document.getElementById('infoIcon');
-        infoIcon.style.display = 'none'; // Hide infoIcon initially
-
-        // Fetch column names from backend and load data
         console.log("Selected Fetching Dataset:", datasetName);  // Debugging
         fetch('/get_columns', {
             method: 'POST',
@@ -191,12 +203,22 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(columns => {
                 console.log("Fetched Columns:", columns);  // Debugging line
                 if (columns && columns.length > 0) {
-                    availableColumns = columns;  // Store available columns for validation
-                    document.getElementById('datasetTitle').dataset.columns = columns.join(', ');
+
+                    datasetColumns[datasetName] = columns.reduce((acc, col) => {
+                        acc[col.col_name] = col.data_type;
+                        return acc;
+                    }, {});
+
+                    availableColumns = columns.map(col => col.col_name);  // Store available columns for validation
+
+                    // Generate column names and types for tooltip display
+                    const columnsInfo = columns.map(col => `${col.col_name} (${col.data_type})`).join(', ');
+
+                    document.getElementById('datasetTitle').dataset.columns = columnsInfo;
 
                     // Set the title attribute for the infoIcon to enable tooltip functionality
                     infoIcon.style.display = 'inline';
-                    infoIcon.setAttribute('title', 'Columns: ' + columns.join(', '));
+                    infoIcon.setAttribute('title', 'Columns: ' + columnsInfo);
                     infoIcon.setAttribute('data-bs-toggle', 'tooltip'); // Use Bootstrap 5 attribute for tooltip
 
                     const columnSelect = document.getElementById('columnSelect');
@@ -204,8 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         columnSelect.innerHTML = ''; // Clear previous options
                         columns.forEach(column => {
                             const option = document.createElement('option');
-                            option.value = column;
-                            option.textContent = column;
+                            option.value = column.col_name;
+                            option.textContent = `${column.col_name} (${column.data_type})`;
                             columnSelect.appendChild(option);
                         });
                     }
@@ -220,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
             .catch(error => console.error("Error fetching columns:", error));
+
     }
 
 
