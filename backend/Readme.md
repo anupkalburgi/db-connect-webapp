@@ -97,3 +97,5 @@ query = {
 
 result = execute_query(query)
 ```
+
+dbconnect_ak_local_1 (SP) needs to have permissions across

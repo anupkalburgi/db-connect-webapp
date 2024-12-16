@@ -14,6 +14,8 @@ class DataSource:
 
     """
     def __init__(self):
+        print("Connecting to Databricks")
+        print(f"host: {os.environ.get('DATABRICKS_HOST')}, cluster: {os.environ.get('DATABRICKS_CLUSTER_ID')}, client_id: {os.environ.get('DATABRICKS_CLIENT_ID')}, token: {os.environ.get('DATABRICKS_CLIENT_SECRET')}")
 
        # always need to specify the workspace URL
         if os.environ.get("DATABRICKS_HOST"):
@@ -50,10 +52,10 @@ class DataSource:
         if self.databricks_client_id and self.databricks_client_secret:
             # connect to Service Principal
             os.environ.pop('DATABRICKS_TOKEN', None)
-            self.session = DatabricksSession.builder.validateSession(False).getOrCreate()
+            self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()
         elif self.databricks_token:
             # connect using PAT
-            self.session = DatabricksSession.builder.validateSession(False).getOrCreate()
+            self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()            
         else:
             raise Exception('DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET need to be set *or* DATABRICKS_TOKEN')
 

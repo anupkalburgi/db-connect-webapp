@@ -1,0 +1,11 @@
+[project]
+name = "frontend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12.7"
+dependencies = [
+    "flask>=3.0.3",
+    "pandas>=2.2.3",
+    "requests>=2.32.3",
+]

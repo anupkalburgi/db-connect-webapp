@@ -1,5 +1,8 @@
 from backend.DataSource import *
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_taxis(spark):
     # get some sample data

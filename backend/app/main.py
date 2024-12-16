@@ -125,9 +125,18 @@ async def run_query(query_json: Dict[str, Any]):
 @app.get("/api/v1/tables")
 async def list_tables(catalog: str = None, database: str = None):
     try:
-        # if catalog:
-        #     datasource.session.sql(f"USE {catalog}")
-        tables = datasource.session.sql("SHOW TABLES").collect()
+        tables = datasource.session.sql(f"SHOW TABLES in {catalog}.{database}").collect()
         return [row.tableName for row in tables]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/table/schema")
+async def table_schema(catalog: str = None, database: str = None, table: str = None):
+    try:
+        sql_stmt = f"DESCRIBE {catalog}.{database}.{table}"
+        print(sql_stmt)
+        schema = datasource.session.sql(sqlQuery=sql_stmt).collect()
+        return [row.asDict() for row in schema]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
