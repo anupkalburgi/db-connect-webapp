@@ -46,22 +46,75 @@ A wrapper for extracting connect details and secrets from a secret store can be 
 
 `backend/DataSource.py` allows a backend `DataSource()` instance to be initialised in Python code which has a Spark session connection as an object-instance attribute.
 
-#### Backend Connectivity Test and Example 
-See the example `auth_session_version.py` for testing backend connectivity and seeing an example of how to integrate with the Databricks Connect spark session for data operations.
 
+#  DEVELOPMENT SETUP
 
-## Running the Application 
+This project is structured into two components: the **frontend** and **backend**, each with its own development setup and `run.sh` script for easier execution.
 
-Run the following command to start the Flask server:
+---
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Python >3.10: Required for both the frontend and backend.
+
+---
+
+## Project Structure
+
 ```bash
-python app.py
+DB-CONNECT-WEBAPP
+├── backend
+│   ├── app/                # Backend application code
+│   ├── .venv               # Backend virtual environment
+│   ├── requirements.txt    # Backend dependencies
+│   ├── run.sh              # Script to set up and run the backend
+│   └── README.md           # Backend-specific README
+├── frontend
+│   ├── app/                # Frontend application code
+│   ├── .venv               # Frontend virtual environment
+│   ├── requirements.txt    # Frontend dependencies
+│   ├── run.py              # Frontend entry point
+│   ├── run.sh              # Script to set up and run the frontend
+│   └── README.md           # Frontend-specific README
+└── README.md               # This file
 ```
 
+---
 
+## Running the Backend
 
+Navigate to the `backend` directory and execute the `run.sh` script:
 
+```bash
+cd backend
+./run.sh
+```
+---
 
+## Running the Frontend
 
+Navigate to the `frontend` directory and execute the `run.sh` script:
 
-## Deploying the application
-TODO: Add instructions on how to deploy the application to a cloud provider.
+```bash
+cd frontend
+./run.sh
+```
+---
+
+## Running Both Services Together
+
+You can set up and run both the frontend and backend by running their respective `run.sh` scripts in separate terminal windows:
+
+```bash
+# Terminal 1: Run backend
+cd backend
+./run.sh
+
+# Terminal 2: Run frontend
+cd frontend
+./run.sh
+```
+
+---       
