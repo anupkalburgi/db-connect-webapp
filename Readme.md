@@ -99,6 +99,7 @@ Navigate to the `frontend` directory and execute the `run.sh` script:
 
 ```bash
 cd frontend
+./setup.sh
 ./run.sh
 ```
 ---
@@ -114,7 +115,18 @@ cd backend
 
 # Terminal 2: Run frontend
 cd frontend
+./setup.sh
 ./run.sh
 ```
 
----       
+---      
+
+## Running Both services in docker
+
+
+
+```bash
+ docker-compose up --build
+```
+
+---  
