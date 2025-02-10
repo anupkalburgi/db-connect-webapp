@@ -55,6 +55,7 @@ class DataSource:
             self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()
         elif self.databricks_token:
             # connect using PAT
+            print("Connecting using PAT Token")
             self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()            
         else:
             raise Exception('DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET need to be set *or* DATABRICKS_TOKEN')
