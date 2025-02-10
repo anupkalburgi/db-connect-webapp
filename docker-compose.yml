@@ -8,6 +8,7 @@ services:
     ports:
       - "5000:5000"
     environment:
+      - BASE_BACKEND_URL=http://backend:8000
       - FLASK_APP=run.py
       - FLASK_ENV=development
     depends_on:
