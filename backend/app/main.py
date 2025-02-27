@@ -4,12 +4,29 @@ from typing import List, Dict, Any
 from pydantic import BaseModel
 from .DataSource import DataSource
 
+import logging
+import gc
+
+datasource = DataSource()
+
 app = FastAPI(title="Databricks Query API")
+
+logger = logging.getLogger('uvicorn.error')
 
 # Load .env file
 load_dotenv()
 
-datasource = DataSource()
+
+#def get_connection():
+#    """Get a new DB Connect connection; invalidate any previous before calling this"""
+#    logger.info(f"Initializing Databricks connection")
+#    gc.collect()
+#    ds = DataSource()
+#    return ds
+
+
+
+
 
 class QueryResponse(BaseModel):
     data: List[Dict]
@@ -93,33 +110,41 @@ def build_query(query_json: Dict[str, Any]) -> str:
 
 @app.post("/api/v1/query")
 async def run_query(query_json: Dict[str, Any]):
-    try:
-        # Build the query
-        query = build_query(query_json)
-        
-        # Execute query using your datasource
-        df = datasource.session.sql(query)
-        results = [row.asDict() for row in df.collect()]
-        
-        return {
-            "data": results,
-            "count": len(results),
-            "query": query
-        }
-        
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail={
-                "error": "Unexpected Error",
-                "message": str(e),
-                "query_json": query
+    for attempt in range(2):  # Try twice at most
+        try:
+            # Build the query
+            query = build_query(query_json)
+
+            # Execute query using your datasource
+            logger.info('Getting query results from Databricks connections')
+            df = datasource.session.sql(query)
+            results = [row.asDict() for row in df.collect()]
+
+            return {
+                "data": results,
+                "count": len(results),
+                "query": query
             }
-            )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail={
-                "error": "Unexpected Error",
-                "message": str(e),
-                "query_json": query
-            })
+
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail={
+                    "error": "Unexpected Error",
+                    "message": str(e),
+                    "query_json": query
+                }
+                )
+        except Exception as e:
+            if attempt == 0:  # only runs once, after the first failure - try to re-initialise the datasource
+                #datasource = None
+                logger.info(str(e))
+                #datasource = get_connection()
+                datasource = DataSource()
+            else:
+                raise HTTPException(status_code=500, detail={
+                        "error": "Unexpected Error",
+                        "message": str(e),
+                        "query_json": query
+                    })
 
 
 @app.get("/api/v1/tables")
@@ -129,6 +154,7 @@ async def list_tables(catalog: str = None, database: str = None):
         return [row.tableName for row in tables]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/api/v1/table/schema")
 async def table_schema(catalog: str = None, database: str = None, table: str = None):

@@ -15,4 +15,4 @@ pip install -r requirements.txt
 
 # Run the FastAPI application
 echo "Starting FastAPI application..."
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --log-config logging_config.json

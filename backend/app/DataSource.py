@@ -1,7 +1,12 @@
 """ Backend Interface to the Databricks Lakehouse """
 import os
+import logging
+import datetime
 
 from databricks.connect import DatabricksSession
+
+logger = logging.getLogger('uvicorn.error')
+from logging.config import dictConfig
 
 class DataSource:
     """Initialise a DataSource instance
@@ -14,10 +19,10 @@ class DataSource:
 
     """
     def __init__(self):
-        print("Connecting to Databricks")
-        print(f"host: {os.environ.get('DATABRICKS_HOST')}, cluster: {os.environ.get('DATABRICKS_CLUSTER_ID')}, client_id: {os.environ.get('DATABRICKS_CLIENT_ID')}, token: {os.environ.get('DATABRICKS_CLIENT_SECRET')}")
 
-       # always need to specify the workspace URL
+        logger.info(f"Connecting to Databricks")
+
+        # always need to specify the workspace URL
         if os.environ.get("DATABRICKS_HOST"):
             self.databricks_host = os.environ["DATABRICKS_HOST"]
         else:
@@ -52,10 +57,12 @@ class DataSource:
         if self.databricks_client_id and self.databricks_client_secret:
             # connect to Service Principal
             os.environ.pop('DATABRICKS_TOKEN', None)
+            logger.info(f"Connecting using OAUTH to Service Principal")
             self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()
+
         elif self.databricks_token:
             # connect using PAT
-            print("Connecting using PAT Token")
+            logger.info(f"{datetime.datetime.now().strftime('%FT%X')} Connecting using PAT Token")
             self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()            
         else:
             raise Exception('DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET need to be set *or* DATABRICKS_TOKEN')

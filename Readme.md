@@ -85,12 +85,17 @@ DB-CONNECT-WEBAPP
 
 ## Running the Backend
 
+Further details in [./backend/README.md](./backend/Readme.md)
+
 Navigate to the `backend` directory and execute the `run.sh` script:
 
 ```bash
 cd backend
 ./run.sh
 ```
+
+`run.sh` creates a local venv, installs any Python dependancies and then runs the Backend FastAPI in a Uvicorn web server.
+
 ---
 
 ## Running the Frontend
