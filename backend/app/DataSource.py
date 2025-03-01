@@ -2,11 +2,11 @@
 import os
 import logging
 import datetime
+import gc
 
 from databricks.connect import DatabricksSession
 
 logger = logging.getLogger('uvicorn.error')
-from logging.config import dictConfig
 
 class DataSource:
     """Initialise a DataSource instance
@@ -20,6 +20,7 @@ class DataSource:
     """
     def __init__(self):
 
+        self.session = None
         logger.info(f"Connecting to Databricks")
 
         # always need to specify the workspace URL
@@ -54,6 +55,9 @@ class DataSource:
         else:
             self.databricks_token = False
 
+        self.__connect()
+
+    def __connect(self):
         if self.databricks_client_id and self.databricks_client_secret:
             # connect to Service Principal
             os.environ.pop('DATABRICKS_TOKEN', None)
@@ -63,8 +67,15 @@ class DataSource:
         elif self.databricks_token:
             # connect using PAT
             logger.info(f"{datetime.datetime.now().strftime('%FT%X')} Connecting using PAT Token")
-            self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()            
+            self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()
         else:
             raise Exception('DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET need to be set *or* DATABRICKS_TOKEN')
+
+    def reset(self):
+        logger.info(f"Re-Connecting to Databricks")
+        self.session = None
+        gc.collect()
+        self.__connect()
+
 
 

@@ -46,6 +46,34 @@ A wrapper for extracting connect details and secrets from a secret store can be 
 
 `backend/DataSource.py` allows a backend `DataSource()` instance to be initialised in Python code which has a Spark session connection as an object-instance attribute.
 
+EG 
+
+```
+from .DataSource import DataSource
+
+datasource = DataSource()
+df = datasource.session.sql(query_string)
+```
+
+DB Connect Session timeouts can be handled by handling exceptions and making a single retry after calling the `Datasource.reset()` method:
+
+```python
+for attempt in range(2):  # Try twice at most
+try:
+    # Execute query using your datasource
+    df = datasource.session.sql(query_string)
+    
+except Exception as e:
+    if attempt == 0:  # only runs once; after the first failure try to re-initialise the datasource
+        datasource.reset()
+    else:
+        raise HTTPException(status_code=500, detail={
+                    "error": "Unexpected Error",
+                    "message": str(e),
+                    "query_json": query_string
+                })        
+
+```
 
 #  DEVELOPMENT SETUP
 
