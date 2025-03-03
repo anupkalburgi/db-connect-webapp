@@ -103,6 +103,7 @@ async def run_query(query_json: Dict[str, Any]):
         try:
             # Build the query
             query = build_query(query_json)
+            print(query)
 
             # Execute query using your datasource
             logger.debug(f"connected to {datasource.databricks_host}")

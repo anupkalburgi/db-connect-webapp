@@ -18,9 +18,10 @@ const mockColumns: Column[] = [
   { name: "region", type: "string" },
 ]
 
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
-const CATALOG = "anup_kalburgi";
-const DATABASE = "share_explore";
+// read from local env file
+const API_BASE_URL= process.env.API_BASE_URL;
+const CATALOG = process.env.CATALOG;
+const DATABASE = process.env.DATABASE;
 
 // Server-side API functions
 export async function fetchDatasets(): Promise<Dataset[]> {
@@ -89,6 +90,7 @@ export async function executeQuery(config: QueryConfig): Promise<QueryResult> {
   });
 
   if (!response.ok) {
+    console.log("Error executing query", payload , response); 
     throw new Error(`Error executing query: ${response.statusText}`);
   }
 

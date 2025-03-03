@@ -20,7 +20,7 @@ export function FilterControls({ columns, filters, onFiltersChange }: FilterCont
       ...filters,
       [selectedColumn]: {
         column: selectedColumn,
-        operator: "equals",
+        operator: "=",
         value: "",
       },
     })
@@ -51,8 +51,8 @@ export function FilterControls({ columns, filters, onFiltersChange }: FilterCont
           </SelectTrigger>
           <SelectContent>
             {columns.map((column) => (
-              <SelectItem key={column.col_name} value={column.col_name}>
-                {column.col_name} ({column.data_type})
+              <SelectItem key={column.name} value={column.name}>
+                {column.name} ({column.type})
               </SelectItem>
             ))}
           </SelectContent>
@@ -77,7 +77,7 @@ export function FilterControls({ columns, filters, onFiltersChange }: FilterCont
               </SelectContent>
             </Select>
             <Input
-              value={filter.value}
+              value={Array.isArray(filter.value) ? filter.value.join(",") : filter.value}
               onChange={(e) => updateFilter(column, { value: e.target.value })}
               placeholder={`Enter value...`}
               className="w-[200px]"
