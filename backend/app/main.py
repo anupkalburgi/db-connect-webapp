@@ -155,7 +155,7 @@ async def table_schema(catalog: str = None, database: str = None, table: str = N
         try:
             sql_stmt = f"DESCRIBE {catalog}.{database}.{table}"
             print(sql_stmt)
-            schema = datasource.session.sql(sqlQuery=sql_stmt).collect()
+            schema = datasource.session.sql(sql_stmt).collect()
             return [row.asDict() for row in schema]
         except Exception as e:
             if attempt == 0:  # only runs once; after the first failure try to re-initialise the datasource
