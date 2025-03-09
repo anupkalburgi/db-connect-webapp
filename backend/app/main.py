@@ -12,6 +12,7 @@ logger = logging.getLogger('uvicorn.error')
 # Load .env file
 load_dotenv()
 
+# DB Connect Spark Session connection
 datasource = DataSource()
 
 
