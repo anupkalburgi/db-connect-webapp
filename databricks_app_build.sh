@@ -31,7 +31,13 @@ mkdir -p $BUILD_DIR/static
 # Build frontend
 echo "Building frontend..."
 cd frontend
+# Set environment variable for integrated mode
+export NEXT_PUBLIC_DEPLOYMENT_MODE=integrated
+echo "Set NEXT_PUBLIC_DEPLOYMENT_MODE=integrated for build"
 npm run build
+# Unset the environment variable
+unset NEXT_PUBLIC_DEPLOYMENT_MODE
+echo "Unset NEXT_PUBLIC_DEPLOYMENT_MODE"
 echo "Copying frontend build to $BUILD_DIR/static..."
 cp -r out/* ../$BUILD_DIR/static/
 cd ..
@@ -50,7 +56,7 @@ command: ["uvicorn", "main:app", "--workers", "4"]
 env:
 - name: DATABRICKS_CLUSTER_ID
   value: "$CLUSTER_ID"
-- name: DEPLOYMENT_MODE
+- name: NEXT_PUBLIC_DEPLOYMENT_MODE
   value: "integrated"
 - name: STATIC_FILES_DIR
   value: "static"

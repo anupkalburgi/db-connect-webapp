@@ -19,7 +19,7 @@ logger = logging.getLogger('uvicorn.error')
 load_dotenv()
 
 # Environment configuration
-DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "standalone")  # "standalone" or "integrated"
+DEPLOYMENT_MODE = os.getenv("NEXT_PUBLIC_DEPLOYMENT_MODE", "standalone")  # "standalone" or "integrated"
 STATIC_FILES_DIR = os.getenv("STATIC_FILES_DIR", "static")
 
 datasource = DataSource()

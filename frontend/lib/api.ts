@@ -20,10 +20,15 @@ const mockColumns: Column[] = [
 
 // Need to fix this
 // having issue if reading from env file. When deployed in databricks apps frontend not able to talk to backend api
-const isDevelopment = process.env.NODE_ENV === 'development';
-const API_BASE_URL = isDevelopment 
-  ? 'http://localhost:8000/api/v1'  // Development mode - absolute URL
-  : '/api/v1';                      // Production/integrated mode - relative URL
+const DEPLOYMENT_TYPE = process.env.NEXT_PUBLIC_DEPLOYMENT_MODE || 'standalone';
+
+// Determine API base URL based on deployment type
+const API_BASE_URL = DEPLOYMENT_TYPE === 'integrated'
+  ? '/api/v1'  // Integrated mode (Databricks App) - relative URL
+  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';  // Standalone mode - absolute URL
+
+console.log("Deployment type:", DEPLOYMENT_TYPE);
+console.log("Using API URL:", API_BASE_URL);
 
 console.log("Current environment:", process.env.NODE_ENV);
 
