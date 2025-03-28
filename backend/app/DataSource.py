@@ -6,7 +6,14 @@ import gc
 
 from databricks.connect import DatabricksSession
 
-logger = logging.getLogger('uvicorn.error')
+logger = logging.getLogger('datasource_logger')
+logger.setLevel(logging.INFO)
+
+# Create a formatter to define the log format
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+
+
 
 class DataSource:
     """Initialise a DataSource instance
@@ -18,7 +25,25 @@ class DataSource:
     Otherwise, try to connect with PAT Token
 
     """
-    def __init__(self):
+    def __init__(self, log_root=None):
+
+        # Create a file handler to write logs to a file
+        if log_root:
+            log_file = './' + log_root + '/logs/datasource.log'
+        else:
+            log_file = './logs/datasource.log'
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(formatter)
+
+        # Create a stream handler to print logs to the console
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(formatter)
+
+        # Add the handlers to the logger
+        logger.addHandler(file_handler)
+        logger.addHandler(console_handler)
 
         self.session = None
         logger.info(f"Connecting to Databricks")
@@ -27,6 +52,7 @@ class DataSource:
         if os.environ.get("DATABRICKS_HOST"):
             self.databricks_host = os.environ["DATABRICKS_HOST"]
         else:
+            logger.error('DATABRICKS_HOST environment variable not set')
             raise Exception('DATABRICKS_HOST environment variable not set')
 
         # this can be None for Serverless
@@ -35,6 +61,7 @@ class DataSource:
         else:
             self.databricks_cluster_id = None
             #Todo - implement Serveless Connect functionality
+            logger.error('Serverless DB Connect not implemented yet in this utility')
             raise Exception("Serverless not implemented yet")
 
         # Service Principal ID, can be None for a PAT connection
@@ -69,6 +96,7 @@ class DataSource:
             logger.info(f"{datetime.datetime.now().strftime('%FT%X')} Connecting using PAT Token")
             self.session = DatabricksSession.builder.serverless().validateSession(False).getOrCreate()
         else:
+            logger.error('DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET need to be set *or* DATABRICKS_TOKEN')
             raise Exception('DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET need to be set *or* DATABRICKS_TOKEN')
 
     def reset(self):

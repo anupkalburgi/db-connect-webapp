@@ -55,6 +55,8 @@ datasource = DataSource()
 df = datasource.session.sql(query_string)
 ```
 
+See the example `./backend/examples/backend_data_example.py` for more detail.  
+
 DB Connect Session timeouts can be handled by handling exceptions and making a single retry after calling the `Datasource.reset()` method:
 
 ```python
