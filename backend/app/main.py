@@ -1,8 +1,14 @@
-from fastapi import FastAPI, HTTPException
+import os
+import sys
+
 from dotenv import load_dotenv
 from typing import List, Dict, Any
 from pydantic import BaseModel
-from .DataSource import DataSource
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from DataSource import DataSource
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 import logging
 
@@ -11,6 +17,11 @@ logger = logging.getLogger('uvicorn.error')
 
 # Load .env file
 load_dotenv()
+
+
+# Environment configuration
+DEPLOYMENT_MODE = os.getenv("NEXT_PUBLIC_DEPLOYMENT_MODE", "standalone")  # "standalone" or "integrated"
+STATIC_FILES_DIR = os.getenv("STATIC_FILES_DIR", "static")
 
 # DB Connect Spark Session connection
 datasource = DataSource()
@@ -95,9 +106,11 @@ def build_query(query_json: Dict[str, Any]) -> str:
 
     except Exception as e:
         raise ValueError(f"Error building query: {str(e)}")
+    
+# Create API router for the /api/v1 routes
+api_app = FastAPI()
 
-
-@app.post("/api/v1/query")
+@api_app.post("/query")
 async def run_query(query_json: Dict[str, Any]):
     for attempt in range(2):  # Try twice at most
 
@@ -136,7 +149,7 @@ async def run_query(query_json: Dict[str, Any]):
                 })
 
 
-@app.get("/api/v1/tables")
+@api_app.get("/tables")
 async def list_tables(catalog: str = None, database: str = None):
     for attempt in range(2):  # Try twice at most
         try:
@@ -150,7 +163,7 @@ async def list_tables(catalog: str = None, database: str = None):
                 raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/v1/table/schema")
+@api_app.get("/table/schema")
 async def table_schema(catalog: str = None, database: str = None, table: str = None):
     for attempt in range(2):  # Try twice at most
         try:
@@ -164,3 +177,38 @@ async def table_schema(catalog: str = None, database: str = None, table: str = N
 
             else:
                 raise HTTPException(status_code=500, detail=str(e))
+
+
+# Configure CORS middleware for all modes
+origins = [
+    "http://localhost:8000",  # Backend
+    "http://localhost:3000",  # Frontend dev server
+    "*"  # Allow all origins - you might want to restrict this in production
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+logger.info(f"CORS middleware configured with origins: {origins}")
+
+# Mount the API under /api/v1
+app.mount("/api/v1", api_app)
+
+# In integrated mode (Databricks app), mount static files
+if DEPLOYMENT_MODE.lower() == "integrated":
+    logger.info(f"Running in integrated mode, mounting static files from {STATIC_FILES_DIR}")
+    app.mount("/", StaticFiles(directory=STATIC_FILES_DIR, html=True), name="static")
+else:
+    logger.info("Running in standalone mode, API only")
+    
+    @app.get("/")
+    async def read_root():
+        return {
+            "status": "running",
+            "mode": "standalone",
+            "api": "/api/v1"
+        }
