@@ -2,17 +2,6 @@
 This is a simple example of how to create an interactive web application using Databricks Connect and Flask.
 TODO: Add more details about the project.
 
-## Prerequisites
-
-Python version:
-```python
-python 3.12.7
-```
-
-Install the required libraries:
-```bash
-pip install -r requirements.txt
-```
 
 ### Backend Connectivity to Databricks
 #### DB Connect ####  
@@ -99,32 +88,22 @@ DB-CONNECT-WEBAPP
 │   ├── app/                # Backend application code
 │   ├── .venv               # Backend virtual environment
 │   ├── requirements.txt    # Backend dependencies
-│   ├── run.sh              # Script to set up and run the backend
+│   ├── setuo.sh             # Script to set up and run the backend
 │   └── README.md           # Backend-specific README
 ├── frontend
 │   ├── app/                # Frontend application code
-│   ├── .venv               # Frontend virtual environment
 │   ├── requirements.txt    # Frontend dependencies
-│   ├── run.py              # Frontend entry point
-│   ├── run.sh              # Script to set up and run the frontend
+│   ├── setup.sh            # Script to set up and run the frontend
 │   └── README.md           # Frontend-specific README
 └── README.md               # This file
+└── setup_instructions.md  
 ```
 
 ---
 
 ## Running the Backend
 
-Further details in [./backend/README.md](./backend/Readme.md)
-
-Navigate to the `backend` directory and execute the `run.sh` script:
-
-```bash
-cd backend
-./run.sh
-```
-
-`run.sh` creates a local venv, installs any Python dependancies and then runs the Backend FastAPI in a Uvicorn web server.
+Further details in [Go to Backend setup](setup_instructions.md#backend-setup)
 
 ---
 
@@ -132,12 +111,7 @@ cd backend
 
 Navigate to the `frontend` directory and execute the `run.sh` script:
 
-```bash
-cd frontend
-./setup.sh
-./run.sh
-```
----
+[Go to Frontned Setup](setup_instructions.md#frontend-setup)
 
 ## Running Both Services Together
 
@@ -146,22 +120,17 @@ You can set up and run both the frontend and backend by running their respective
 ```bash
 # Terminal 1: Run backend
 cd backend
-./run.sh
+./setup.sh
 
 # Terminal 2: Run frontend
 cd frontend
 ./setup.sh
-./run.sh
 ```
 
 ---      
 
 ## Running Both services in docker
 
-
-
-```bash
- docker-compose up --build
-```
+[Go to Docker Setup](setup_instructions.md#dockerpodman-setup)
 
 ---  

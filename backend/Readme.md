@@ -16,9 +16,7 @@ A REST API service for executing database queries using FastAPI framework and Da
 
 ## Setup and Installation
 
-```bash
-./run.sh
-```
+[Go to Backend Setup](/setup_instructions.md#backend-setup)
 
 ## Json to build query
 ```json
@@ -97,5 +95,3 @@ query = {
 
 result = execute_query(query)
 ```
-
-dbconnect_ak_local_1 (SP) needs to have permissions across
