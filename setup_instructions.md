@@ -6,6 +6,7 @@ This README provides instructions for setting up and running both the frontend a
 - [Backend Setup](#backend-setup)
 - [Frontend Setup](#frontend-setup)
 - [Docker/Podman Setup](#dockerpodman-setup)
+- [Databricks App Deployment Guide](#databricks-app-deployment-guide)
 
 ## Backend Setup
 
@@ -129,3 +130,36 @@ This will:
 
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8000
+
+
+## Databricks App Deployment Guide
+
+### Usage
+
+Run the deployment script with the following parameters:
+
+```bash
+./databricks_app_build.sh <workspace_path> <app_name>
+```
+
+### Parameters
+
+- `workspace_path`: The path in Databricks workspace where the app files will be stored
+- `app_name`: The name of your Databricks app
+
+
+### Example
+
+```bash
+./databricks_app_build.sh /Workspace/Apps/data_explorer data_explorer
+```
+
+### Environment Variables
+
+The script sets the following environment variables:
+
+- `NEXT_PUBLIC_DEPLOYMENT_MODE=integrated`: Configures the frontend for integrated mode
+- `STATIC_FILES_DIR`: Points to the static files directory
+
+
+

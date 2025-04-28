@@ -134,3 +134,9 @@ cd frontend
 [Go to Docker Setup](setup_instructions.md#dockerpodman-setup)
 
 ---  
+
+## Deploying to Databricks Apps
+
+[Go to Databricks Apps setup](setup_instructions.md#databricks-app-deployment-guide)
+
+---  
