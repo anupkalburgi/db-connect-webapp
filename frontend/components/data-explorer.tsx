@@ -13,6 +13,7 @@ interface DataExplorerProps {
 }
 
 export function DataExplorer({ initialDatasets }: DataExplorerProps) {
+  const [datasets] = useState<Dataset[]>(initialDatasets)
   const [columns, setColumns] = useState<Column[]>([])
   const [selectedDataset, setSelectedDataset] = useState<string>("")
   const [queryConfig, setQueryConfig] = useState<QueryConfig>({
@@ -61,7 +62,7 @@ export function DataExplorer({ initialDatasets }: DataExplorerProps) {
         {/* Left Sidebar */}
         <div className="w-80 flex-shrink-0 border-r overflow-hidden flex flex-col">
           <AnalysisPanel
-            datasets={initialDatasets}
+            datasets={datasets}
             columns={columns}
             onQueryChange={setQueryConfig}
             onDatasetSelect={handleDatasetSelect}

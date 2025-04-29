@@ -12,12 +12,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import logging
 
+# Create API router for the /api/v1 routes
 app = FastAPI(title="Databricks Query API")
 logger = logging.getLogger('uvicorn.error')
 
 # Load .env file
 load_dotenv()
-
 
 # Environment configuration
 DEPLOYMENT_MODE = os.getenv("NEXT_PUBLIC_DEPLOYMENT_MODE", "standalone")  # "standalone" or "integrated"
@@ -25,7 +25,6 @@ STATIC_FILES_DIR = os.getenv("STATIC_FILES_DIR", "static")
 
 # DB Connect Spark Session connection
 datasource = DataSource()
-
 
 class QueryResponse(BaseModel):
     data: List[Dict]
@@ -106,11 +105,8 @@ def build_query(query_json: Dict[str, Any]) -> str:
 
     except Exception as e:
         raise ValueError(f"Error building query: {str(e)}")
-    
-# Create API router for the /api/v1 routes
-api_app = FastAPI()
 
-@api_app.post("/query")
+@app.post("/api/v1/query")
 async def run_query(query_json: Dict[str, Any]):
     for attempt in range(2):  # Try twice at most
 
@@ -148,8 +144,7 @@ async def run_query(query_json: Dict[str, Any]):
                     "query_json": query
                 })
 
-
-@api_app.get("/tables")
+@app.get("/api/v1/tables")
 async def list_tables(catalog: str = None, database: str = None):
     for attempt in range(2):  # Try twice at most
         try:
@@ -162,8 +157,7 @@ async def list_tables(catalog: str = None, database: str = None):
             else:
                 raise HTTPException(status_code=500, detail=str(e))
 
-
-@api_app.get("/table/schema")
+@app.get("/api/v1/table/schema")
 async def table_schema(catalog: str = None, database: str = None, table: str = None):
     for attempt in range(2):  # Try twice at most
         try:
@@ -195,8 +189,7 @@ app.add_middleware(
 )
 logger.info(f"CORS middleware configured with origins: {origins}")
 
-# Mount the API under /api/v1
-app.mount("/api/v1", api_app)
+# app.mount("/api/v1", api_app)
 
 # In integrated mode (Databricks app), mount static files
 if DEPLOYMENT_MODE.lower() == "integrated":
@@ -204,11 +197,3 @@ if DEPLOYMENT_MODE.lower() == "integrated":
     app.mount("/", StaticFiles(directory=STATIC_FILES_DIR, html=True), name="static")
 else:
     logger.info("Running in standalone mode, API only")
-    
-    @app.get("/")
-    async def read_root():
-        return {
-            "status": "running",
-            "mode": "standalone",
-            "api": "/api/v1"
-        }
