@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend - DB Connect WebApp
+
+## Overview
+
+The frontend of the **DB Connect WebApp** is a user interface built to interact with datasets, perform analysis, and visualize data. It provides features like dataset selection, filtering, grouping, and querying, making it easier for users to explore and analyze data.
+
+## Technologies Used
+
+The frontend is built using the following technologies:
+
+- **TypeScript**: For type-safe JavaScript development.
+- **React**: As the core library for building the user interface.
+- **Next.js**: For server-side rendering and routing.
+- **Tailwind CSS**: For styling the application.
+- **Flask (API Integration)**: The frontend communicates with a Flask-based backend API for fetching datasets and performing operations.
+
+## Features
+
+- Dataset browsing and selection.
+- Query building with filters, group-by, and aggregations.
+- Visualization of query results.
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to set up and run the frontend locally:
+
+### Prerequisites
+
+Ensure you have the following installed on your system:
+
+- **Node.js** (v16 or later)
+- **npm** or **yarn**
+- **Python** (for backend API if needed)
+
+### Installation
+
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+   Or, if you prefer `yarn`:
+
+   ```bash
+   yarn install
+   ```
+
+### Running the Development Server
+
+To start the development server, run:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+./run.sh
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This script will start the frontend server. By default, the application will be available at [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The frontend relies on environment variables for API endpoints. Create a `.env.local` file in the `frontend` directory and add the following variables:
 
-## Learn More
+```env
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api/v1
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Replace the URL with the actual backend API base URL.
