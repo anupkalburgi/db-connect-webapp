@@ -22,6 +22,7 @@ source venv/bin/activate
 # Install requirements
 echo "Installing requirements..."
 pip install -r requirements.txt
+mkdir -p logs
 
 # Install development requirements if they exist
 if [[ "$1" == "test" || "$1" == "test-v" ]]; then
