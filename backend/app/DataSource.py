@@ -29,7 +29,7 @@ class DataSource:
 
         # Create a file handler to write logs to a file
         if log_root:
-            log_file = './' + log_root + '/logs/datasource.log'
+            log_file = './' + log_root + 'datasource.log'
         else:
             log_file = './logs/datasource.log'
         file_handler = logging.FileHandler(log_file)
