@@ -50,10 +50,17 @@ Ensure you have the following installed on your system:
 ### Running the Development Server
 
 To start the development server, run:
+   
+   ```bash
+   # Run in development mode (default)
+   ./run.sh
 
-```bash
-./run.sh
-```
+   # OR explicitly specify development mode
+   ./run.sh dev
+
+   # Run in production mode
+   ./run.sh prod
+   ```
 
 This script will start the frontend server. By default, the application will be available at [http://localhost:3000](http://localhost:3000).
 

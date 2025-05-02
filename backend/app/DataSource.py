@@ -55,15 +55,6 @@ class DataSource:
             logger.error('DATABRICKS_HOST environment variable not set')
             raise Exception('DATABRICKS_HOST environment variable not set')
 
-        # this can be None for Serverless
-        if os.environ.get("DATABRICKS_CLUSTER_ID"):
-            self.databricks_cluster_id = os.environ["DATABRICKS_CLUSTER_ID"]
-        else:
-            self.databricks_cluster_id = None
-            #Todo - implement Serveless Connect functionality
-            logger.error('Serverless DB Connect not implemented yet in this utility')
-            raise Exception("Serverless not implemented yet")
-
         # Service Principal ID, can be None for a PAT connection
         if os.environ.get("DATABRICKS_CLIENT_ID"):
             self.databricks_client_id = os.environ["DATABRICKS_CLIENT_ID"]

@@ -1,25 +1,23 @@
 #!/bin/bash
 
 # Script to build and deploy a Databricks app
-# Usage: ./deploy_databricks_app.sh <workspace_path> <app_name> [cluster_id]
+# Usage: ./deploy_databricks_app.sh <workspace_path> <app_name>
 
 # Check for required parameters
 if [ $# -lt 2 ]; then
   echo "Error: Missing required parameters"
-  echo "Usage: $0 <workspace_path> <app_name> [cluster_id]"
-  echo "Example: $0 /Workspace/Apps/data_explorer data_explorer 0108-044200-8fs73ftg"
+  echo "Usage: $0 <workspace_path> <app_name>"
+  echo "Example: $0 /Workspace/Apps/data_explorer data_explorer"
   exit 1
 fi
 
 # Accept parameters
 WORKSPACE_PATH=$1
 APP_NAME=$2
-CLUSTER_ID=${3:-"0108-044200-8fs73ftg"}
 
 echo "==== Databricks App Deployment ===="
 echo "Workspace path: $WORKSPACE_PATH"
 echo "App name: $APP_NAME"
-echo "Cluster ID: $CLUSTER_ID"
 
 # Create build directory
 BUILD_DIR="databricks_app_build"
@@ -27,6 +25,8 @@ echo "Creating build directory: $BUILD_DIR"
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR
 mkdir -p $BUILD_DIR/static
+mkdir -p $BUILD_DIR/logs
+touch $BUILD_DIR/logs/datasource.log
 
 # Build frontend
 echo "Building frontend..."
@@ -54,8 +54,6 @@ echo "Creating app.yml with cluster ID: $CLUSTER_ID"
 cat > $BUILD_DIR/app.yml << EOL
 command: ["uvicorn", "main:app", "--workers", "4"]
 env:
-- name: DATABRICKS_CLUSTER_ID
-  value: "$CLUSTER_ID"
 - name: NEXT_PUBLIC_DEPLOYMENT_MODE
   value: "integrated"
 - name: STATIC_FILES_DIR
