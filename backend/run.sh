@@ -35,7 +35,7 @@ check_env_var() {
 check_required_env_vars() {
     echo "Checking required environment variables..."
     check_env_var "DATABRICKS_HOST"
-    check_env_var "DATABRICKS_CLUSTER_ID"
+    # check_env_var "DATABRICKS_CLUSTER_ID" # not needed when using serverless
 
     # Check for Service Principal credentials
     if [ -n "$(printenv DATABRICKS_CLIENT_ID)" ] && [ -n "$(printenv DATABRICKS_CLIENT_SECRET)" ]; then
