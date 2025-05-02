@@ -59,17 +59,10 @@ The backend is built using **Flask** and integrates with **Databricks Connect** 
    cd backend
    ```
 
-2. Install dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Set up environment variables for Databricks connectivity:
+2. Set up environment variables for Databricks connectivity:
 
    ```bash
    export DATABRICKS_HOST=https://<my-workspace>.databricks.com/
-   export DATABRICKS_CLUSTER_ID=<cluster-id>
    export DATABRICKS_CLIENT_ID=<client-id>
    export DATABRICKS_CLIENT_SECRET=<client-secret>
    ```
@@ -80,13 +73,36 @@ The backend is built using **Flask** and integrates with **Databricks Connect** 
    export DATABRICKS_TOKEN=<personal-access-token>
    ```
 
-4. Run the backend server:
+3. Run the backend server:
+
+   ## Setup and Installation
 
    ```bash
    ./run.sh
    ```
 
-   The backend will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
+### Testing the Backend
+
+The script also provides options for running tests:
+
+   ```bash
+   # Run tests
+   ./run.sh test
+
+   # Run tests with verbose output
+   ./run.sh test-v
+   ```
+
+### Available Options
+
+| Option  | Description |
+|---------|-------------|
+| `run`   | Run the FastAPI application (default) |
+| `test`  | Run the tests |
+| `test-v`| Run the tests in verbose mode |
+| `help`  | Show help message |
+
+The backend will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 For more details, refer to the [backend README](./backend/README.md).
 
@@ -138,7 +154,14 @@ The frontend is built using **React**, **Next.js**, and **Tailwind CSS**. It pro
 4. Run the frontend server:
 
    ```bash
+   # Run in development mode (default)
    ./run.sh
+
+   # OR explicitly specify development mode
+   ./run.sh dev
+
+   # Run in production mode
+   ./run.sh prod
    ```
 
    The frontend will be available at [http://localhost:3000](http://localhost:3000).
@@ -159,3 +182,74 @@ The backend uses [Databricks Connect](https://docs.databricks.com/en/dev-tools/d
 The frontend communicates with the backend using RESTful APIs. Ensure the `NEXT_PUBLIC_API_BASE_URL` environment variable is correctly set to point to the backend server.
 
 ---
+
+## Docker/Podman Setup
+
+Both frontend and backend can be run using Docker/Podman with the `podman_setup.sh` script.
+
+### Prerequisites
+- Docker or Podman
+- podman-compose (if using compose mode)
+
+### Running with Docker/Podman
+
+```bash
+# Make the script executable (first time only)
+chmod +x docker_setup.sh
+
+# Run frontend and backend as separate services (default)
+./docker_setup.sh
+
+# Run using compose mode
+./docker_setup.sh -m compose
+```
+
+This will:
+1. Ensure the Podman machine is running
+2. Clean up existing containers and images
+3. Build and run the services based on the selected mode
+
+### Available Options
+
+| Option | Description |
+|--------|-------------|
+| `-m, --mode MODE` | Mode to run services (separate or compose, default: separate) |
+| `-f, --frontend PATH` | Path to frontend Dockerfile (default: ./frontend/Dockerfile) |
+| `-b, --backend PATH` | Path to backend Dockerfile (default: ./backend/Dockerfile) |
+| `-c, --compose PATH` | Path to compose file (default: ./docker-compose.yml) |
+| `-h, --help` | Show help information |
+
+### Service Endpoints
+
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8000
+
+
+## Databricks App Deployment Guide
+
+### Usage
+
+Run the deployment script with the following parameters:
+
+```bash
+./databricks_app_build.sh <workspace_path> <app_name>
+```
+
+### Parameters
+
+- `workspace_path`: The path in Databricks workspace where the app files will be stored
+- `app_name`: The name of your Databricks app
+
+
+### Example
+
+```bash
+./databricks_app_build.sh /Workspace/Apps/data_explorer data_explorer
+```
+
+### Environment Variables
+
+The script sets the following environment variables:
+
+- `NEXT_PUBLIC_DEPLOYMENT_MODE=integrated`: Configures the frontend for integrated mode
+- `STATIC_FILES_DIR`: Points to the static files directory
