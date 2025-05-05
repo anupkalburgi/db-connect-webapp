@@ -2,12 +2,16 @@
 
 ## Overview
 
-The **DB Connect WebApp** is an interactive web application designed to connect to Databricks using Databricks Connect and Flask for backend services, and a React-based frontend for user interaction. The application enables users to interact with datasets, perform analysis, and visualize data seamlessly.
+The **DB Connect WebApp** is an interactive web application designed to connect to Databricks using Databricks Connect and FastAPI for backend services, and a React-based frontend for user interaction. The application enables users to interact with datasets, perform analysis, and visualize data seamlessly.
 
 This repository is structured into two main components:
 
 - **Backend**: Handles API services, connects to Databricks, and processes data.
 - **Frontend**: Provides a user interface for dataset selection, querying, and visualization.
+
+The Frontend user interface calls the API implemented in Python and FastAPI.  FastAPI implements the logic to pass requests to the Databricks data platform services and return responses and data-sets.  
+
+This is just a demonstration application showing the approach of a decoupled Web UI, API Service and data service implementation.  The example application allows a set of Databricks Delta table resources to be queried and filtered with a simple UI interface that relies on logic coded in the API layer to handle the data requests.  
 
 ---
 
@@ -17,8 +21,10 @@ Before you begin, ensure you have the following installed:
 
 - **Python** (v3.12.7 or later)
 - **Node.js** (v16 or later)
-- **npm** or **yarn**
-- **Docker** (optional, for containerized deployment)
+- **npm** or **yarn**   
+
+also, optionally, consider  
+- **Docker** (for containerized deployment)
 
 ---
 
@@ -43,15 +49,23 @@ DB-CONNECT-WEBAPP
 
 ## Backend
 
-The backend is built using **Flask** and integrates with **Databricks Connect** to provide data and compute services. It handles API requests, connects to Databricks clusters, and processes data for the frontend.
+The backend is built using **Fast API** and integrates with **Databricks Connect** to provide data and compute services. It handles API requests, connects to Databricks clusters, and processes data for the frontend.
 
 ### Key Features
 
 - Connects to Databricks using [Databricks Connect](https://docs.databricks.com/en/dev-tools/databricks-connect/index.html).
-- Supports OAuth M2M authentication for secure access.
-- Provides APIs for querying datasets and performing operations.
+- Supports [OAuth M2M](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-m2m) (Machine to Machine) authentication for secure access.  The application connects with a Databricks OAuth Client ID and uses a Client Secret to connect and obtain a temporary OAuth token.
+- Provides APIs for querying Databricks datasets and performing operations.  These example methods would be customised depending on the application requirements.
+- The API interface layer allows the PySpark data access layer to built within a unit-test framework. 
 
-### Setup and Running
+### Backend Configure and Run
+
+Preqs:  
+- A Databricks platform with compute services and some target Delta tables stored in Unity Catalog.  
+- For a quick-start test the `samples.nyctaxi` catalog-schema can be used.  The table `trips` is located here for a default Databricks installation and can be used for testing the application.
+- Create an OAUTH or PAT token connection configuration to use with the Databricks backend configuration (see the following Setup steps that use this)
+
+Setup:
 
 1. Navigate to the `backend` directory:
 
@@ -119,7 +133,7 @@ The frontend is built using **React**, **Next.js**, and **Tailwind CSS**. It pro
 - Visualization of query results.
 - Modular and reusable UI components.
 
-### Setup and Running
+### Frontend Configure and Run
 
 1. Navigate to the `frontend` directory:
 
